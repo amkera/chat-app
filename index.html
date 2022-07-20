@@ -13,7 +13,7 @@
   integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
   crossorigin="anonymous"
 ></script>
-<!-- <script src="/socket.io/socket.io.js"></script> -->
+<script src="/socket.io/socket.io.js"></script>
 <html lang="en">
   <head>
     <link
@@ -48,12 +48,17 @@
     </div>
 
     <script>
+      let socket = io()
+
       $(() => {
         $("#send").click(() => {
-          addMessage({ name: "tim", message: "hey" })
+          var message = { name: $("#name").val(), message: $("#message").val() }
+          postMessage(message)
         })
         getMessages()
-      })
+      }) //This is the document ready function
+
+      socket.on("message", addMessage) //This is an event listener, checking for the 'message' event
 
       function addMessage(message) {
         $("#messages").append(
@@ -65,6 +70,10 @@
         $.get("http://localhost:3000/messages", (data) => {
           data.forEach(addMessage)
         })
+      }
+
+      function postMessage(message) {
+        $.post("http://localhost:3000/messages", message)
       }
     </script>
   </body>
