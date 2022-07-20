@@ -13,7 +13,7 @@
   integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
   crossorigin="anonymous"
 ></script>
-<script src="/socket.io/socket.io.js"></script>
+<!-- <script src="/socket.io/socket.io.js"></script> -->
 <html lang="en">
   <head>
     <link
@@ -52,12 +52,19 @@
         $("#send").click(() => {
           addMessage({ name: "tim", message: "hey" })
         })
+        getMessages()
       })
 
       function addMessage(message) {
         $("#messages").append(
           `<h4> ${message.name} </h4> <p> ${message.message} </p>`
         )
+      }
+
+      function getMessages() {
+        $.get("http://localhost:3000/messages", (data) => {
+          data.forEach(addMessage)
+        })
       }
     </script>
   </body>
