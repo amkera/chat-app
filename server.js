@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
 let server = http.listen(3000, () =>
   console.log("server is listening on port ", server.address().port)
 )
+//Without socket, it's app.listen. With socket, it's http.listen
 
 /**
  * Body-parser is the Node. js body parsing middleware.
