@@ -58,7 +58,9 @@
         getMessages()
       }) //This is the document ready function
 
-      socket.on("message", addMessage) //This is an event listener, checking for the 'message' event
+      socket.on("message", addMessage)
+      //This is an event listener, checking for the 'message' event.
+      //When it happens, perform addMessage function
 
       function addMessage(message) {
         $("#messages").append(

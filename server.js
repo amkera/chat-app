@@ -3,30 +3,51 @@ let bodyParser = require("body-parser")
 let app = express()
 let http = require("http").Server(app) //These two lines add socket here in the backend
 let io = require("socket.io")(http)
+let mongoose = require("mongoose")
 
 app.use(express.static(__dirname)) //the whole path, which is /Users/ambertorres/code/flex-time/chat-app
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-let messages = [
-  { name: "Tim", message: "Hello" },
-  { name: "Jane", message: "I'm Jane" },
-]
+let dbURL =
+  "mongodb+srv://user:user@learning-node.rqqu4.mongodb.net/?retryWrites=true&w=majority"
+
+let Message = mongoose.model("Message", {
+  name: String,
+  message: String,
+})
 
 app.get("/messages", (req, res) => {
-  res.send(messages)
+  Message.find({}, (err, messages) => {
+    res.send(messages)
+  })
 })
 
 app.post("/messages", (req, res) => {
-  console.log(req.body)
-  messages.push(req.body) //Add the new message to the messages array
-  io.emit("message", req.body) //Server notifies client of new 'message' event
-  res.sendStatus(200)
+  let message = new Message(req.body)
+
+  message.save((err) => {
+    if (err) {
+      sendStatus(500)
+    }
+    io.emit("message", req.body)
+    //Server notifies client of new 'message' event.
+    //The event is called message, and the req.body
+    //contains the message we want to send
+    res.sendStatus(200)
+  })
 })
 
 io.on("connection", (socket) => {
   console.log("user connected")
 }) //Check for the connection event. Supply a function that takes a socket.
+
+mongoose.connect(dbURL, (err) => {
+  console.log(
+    "mongo db connection",
+    err ? `There was an error: ${err}` : "No errors at this time"
+  )
+})
 
 let server = http.listen(3000, () =>
   console.log("server is listening on port ", server.address().port)
