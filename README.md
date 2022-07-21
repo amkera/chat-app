@@ -17,3 +17,8 @@ Made with bootstrap
 # Database
 
 MongoDB, a noSQL db
+
+# Tests
+
+Run `npm test` to run the Jasmine test suite
+Cannot natively make HTTP requests from the test files, so we installed "request", a library (`npm install --save-dev request`)
