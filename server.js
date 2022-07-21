@@ -23,19 +23,29 @@ app.get("/messages", (req, res) => {
   })
 })
 
-app.post("/messages", (req, res) => {
-  let message = new Message(req.body)
+app.post("/messages", async (req, res) => {
+  try {
+    let message = new Message(req.body)
 
-  message.save((err) => {
-    if (err) {
-      sendStatus(500)
+    let savedMessage = await message.save() //save the individual message object
+
+    console.log("saved")
+
+    let censored = await Message.findOne({ message: "badword" }) //search the Message "class"
+    if (censored) {
+      await Message.remove({ _id: censored.id }) //This is a promise
+    } else {
+      io.emit("message", req.body) //Server notifies client of new 'message' event.The event is called message, and the req.body contains the message we want to send
     }
-    io.emit("message", req.body)
-    //Server notifies client of new 'message' event.
-    //The event is called message, and the req.body
-    //contains the message we want to send
+
     res.sendStatus(200)
-  })
+  } catch (error) {
+    res.sendStatus(500)
+    return console.error(error)
+  } finally {
+    //use finally if you have a logger: logger.log('message post endpoint was called')
+    console.log("post message complete")
+  }
 })
 
 io.on("connection", (socket) => {
